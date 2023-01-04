@@ -33,6 +33,13 @@ function App() {
       name: 'isApplied',
       title: 'Применена',
       width: 100,
+      cellRender(cellValue) {
+        if (cellValue) {
+          return <span style={{ color: 'green' }}>+</span>
+        } else {
+          return <span style={{ color: 'red' }}>-</span>
+        }
+      },
     },
   ]
   return (

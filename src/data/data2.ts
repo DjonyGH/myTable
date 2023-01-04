@@ -11,6 +11,6 @@ export const data2 = [
     benefitCode: 'Код льготы 2',
     benefitName: 'Наменование льготы 2',
     benefitValue: 20555,
-    isApplied: true,
+    isApplied: false,
   },
 ]

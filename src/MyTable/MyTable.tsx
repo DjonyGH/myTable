@@ -4,11 +4,12 @@ import { prepareRows } from '../utils'
 import styles from './MyTable.module.css'
 
 interface IProps {
-  columns: IColumn[]
   rows: TObject[]
+  columns?: IColumn[]
+  rowHeight?: number
 }
 
-export const MyTable: React.FC<IProps> = ({ columns, rows }) => {
+export const MyTable: React.FC<IProps> = ({ columns, rows, rowHeight }) => {
   const preparedRows = prepareRows(rows)
 
   return (
@@ -26,13 +27,13 @@ export const MyTable: React.FC<IProps> = ({ columns, rows }) => {
 
       <tbody>
         {preparedRows.map((row: any, idx: number) => (
-          <tr key={idx}>
+          <tr key={idx} style={{ height: rowHeight ? `${rowHeight}px` : 'auto' }}>
             {columns
               ? columns.map((col, idx) => {
                   if (col.name in row) {
                     return (
                       <td rowSpan={row[col.name]?.rowSpan} className={styles.cell} key={idx}>
-                        {row[col.name]?.value}
+                        {col.cellRender?.(row[col.name]?.value, row) || row[col.name]?.value}
                       </td>
                     )
                   } else {

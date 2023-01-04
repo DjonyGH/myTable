@@ -7,7 +7,7 @@ export type TValueRowSpanObject = { [key: string]: { value: TValue; rowSpan: num
 export interface IColumn {
   name: string
   title: string
-  width: number
+  width?: number
+  cellRender?: (cellValue: TValue, row?: { [key: string]: TValue }[]) => JSX.Element
   // type: 'string' | 'number' | 'boolean'
-  // cellRender: (cell: {[key: string]: TValue}) => void
 }
