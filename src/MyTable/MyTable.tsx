@@ -6,21 +6,25 @@ import styles from './MyTable.module.css'
 interface IProps {
   rows: TRow[]
   columns?: IColumn[]
+  filterEnabled?: boolean
   rowHeight?: number
   tableStyle?: React.CSSProperties
   thStyle?: React.CSSProperties
   tdStyle?: React.CSSProperties
   rowStylePrepare?: (row: TValueRowSpanObject, rowIndex?: number) => React.CSSProperties | undefined
+  filterCellStyle?: React.CSSProperties
 }
 
 export const MyTable: React.FC<IProps> = ({
   columns,
   rows,
+  filterEnabled,
   rowHeight,
   tableStyle,
   thStyle,
   tdStyle,
   rowStylePrepare,
+  filterCellStyle,
 }) => {
   const preparedRows = prepareRows(rows)
 
@@ -38,6 +42,19 @@ export const MyTable: React.FC<IProps> = ({
       </thead>
 
       <tbody>
+        {/* Фильтры */}
+        {filterEnabled && (
+          <tr className={styles.filterRow}>
+            {columns &&
+              columns.map((col, idx) => (
+                <td style={filterCellStyle} key={idx}>
+                  {col.filter?.mode}
+                </td>
+              ))}
+          </tr>
+        )}
+
+        {/* Строки */}
         {preparedRows.map((row: TValueRowSpanObject, idx: number) => (
           <tr key={idx} style={{ ...rowStylePrepare?.(row), height: rowHeight ? `${rowHeight}px` : 'auto' }}>
             {columns

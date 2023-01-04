@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { data1 } from './data/data1'
 import { data2 } from './data/data2'
 import { data3 } from './data/data3'
@@ -7,6 +7,8 @@ import { MyTable } from './MyTable/MyTable'
 import { IColumn, TValueRowSpanObject } from './types'
 
 function App() {
+  const [filterVisible, setFilterVisible] = useState<boolean>(false)
+
   const columns: IColumn[] = [
     {
       name: 'id',
@@ -66,18 +68,25 @@ function App() {
     }
   }
 
+  const filterCellStyle: React.CSSProperties = {
+    border: '1px solid hsl(220deg, 6%, 80%)',
+  }
+
   return (
     <div className='App'>
+      <button onClick={() => setFilterVisible((prevValue) => !prevValue)}>Показать фильтр</button>
       {/* <h1>Таблица 1</h1>
       <MyTable rows={data1} /> */}
       <h1>Таблица 2</h1>
       <MyTable
         columns={columns}
         rows={data2}
+        filterEnabled={filterVisible}
         tableStyle={tableStyle}
         thStyle={thStyle}
         tdStyle={tdStyle}
         rowStylePrepare={rowStylePrepare}
+        filterCellStyle={filterCellStyle}
       />
       {/* <h1>Таблица 3</h1>
       <MyTable rows={data3} />

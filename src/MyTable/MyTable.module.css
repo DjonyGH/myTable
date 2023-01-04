@@ -7,3 +7,6 @@
 .cell {
   border: 1px solid black;
 }
+.filterRow {
+  height: 30px;
+}
