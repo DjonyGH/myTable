@@ -1,7 +1,8 @@
-import React from 'react'
-import { IColumn, TRow, TValue, TValueRowSpanObject } from '../types'
+import React, { useEffect, useState } from 'react'
+import { IColumn, TFilterMode, TRow, TValue, TValueRowSpanObject } from '../types'
 import { prepareRows } from '../utils'
 import styles from './MyTable.module.css'
+import './myTable.css'
 
 interface IProps {
   rows: TRow[]
@@ -26,7 +27,46 @@ export const MyTable: React.FC<IProps> = ({
   rowStylePrepare,
   filterCellStyle,
 }) => {
+  const [filterValue, setFilterValue] = useState<{ [key: string]: { mode: TFilterMode; value: TValue } } | undefined>()
+
   const preparedRows = prepareRows(rows)
+
+  const getFilterInputs: (columnName: string) => { [key: string]: JSX.Element } = (columnName) => ({
+    startWith: (
+      <input
+        type='text'
+        className='filter_input'
+        name={columnName}
+        placeholder='Начинается с ...'
+        onBlur={(e) => {
+          if (!e.target.value || filterValue?.[e.target.name]?.value === e.target.value) return
+          setFilterValue({
+            ...filterValue,
+            [e.target.name]: { mode: 'startWith', value: e.target.value },
+          })
+        }}
+      />
+    ),
+    contains: (
+      <input
+        type='text'
+        className='filter_input'
+        name={columnName}
+        placeholder='Содержит ...'
+        onBlur={(e) => {
+          if (!e.target.value || filterValue?.[e.target.name]?.value === e.target.value) return
+          setFilterValue({
+            ...filterValue,
+            [e.target.name]: { mode: 'contains', value: e.target.value },
+          })
+        }}
+      />
+    ),
+  })
+
+  useEffect(() => {
+    filterValue && console.log('load new data with filter:', filterValue)
+  }, [filterValue])
 
   return (
     <table style={tableStyle}>
@@ -48,7 +88,7 @@ export const MyTable: React.FC<IProps> = ({
             {columns &&
               columns.map((col, idx) => (
                 <td style={filterCellStyle} key={idx}>
-                  {col.filter?.mode}
+                  {col.filter?.mode && getFilterInputs(col.name)[col.filter.mode]}
                 </td>
               ))}
           </tr>

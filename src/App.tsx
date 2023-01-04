@@ -19,16 +19,19 @@ function App() {
       name: 'benefitCode',
       title: 'Код',
       width: 200,
+      filter: { mode: 'startWith' },
     },
     {
       name: 'benefitName',
       title: 'Наименование',
       width: 200,
+      filter: { mode: 'contains' },
     },
     {
       name: 'benefitValue',
       title: 'Величина льготы',
       width: 200,
+      filter: { mode: 'fromTo' },
     },
     {
       name: 'isApplied',

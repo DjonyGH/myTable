@@ -1,0 +1,6 @@
+.filter_input {
+  width: calc(100% - 14px);
+  border: none;
+  outline: none;
+  padding: 0 5px;
+}
