@@ -7,7 +7,6 @@ import { MyTable } from './MyTable/MyTable'
 import { IColumn } from './types'
 
 function App() {
-  console.log('React18: render')
   const columns: IColumn[] = [
     {
       name: 'id',
@@ -42,6 +41,7 @@ function App() {
       },
     },
   ]
+
   return (
     <div className='App'>
       {/* <h1>Таблица 1</h1>

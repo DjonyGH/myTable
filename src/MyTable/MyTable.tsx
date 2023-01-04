@@ -1,10 +1,10 @@
 import React from 'react'
-import { IColumn, TObject, TValue } from '../types'
+import { IColumn, TRow, TValue, TValueRowSpanObject } from '../types'
 import { prepareRows } from '../utils'
 import styles from './MyTable.module.css'
 
 interface IProps {
-  rows: TObject[]
+  rows: TRow[]
   columns?: IColumn[]
   rowHeight?: number
 }
@@ -26,7 +26,7 @@ export const MyTable: React.FC<IProps> = ({ columns, rows, rowHeight }) => {
       </thead>
 
       <tbody>
-        {preparedRows.map((row: any, idx: number) => (
+        {preparedRows.map((row: TValueRowSpanObject, idx: number) => (
           <tr key={idx} style={{ height: rowHeight ? `${rowHeight}px` : 'auto' }}>
             {columns
               ? columns.map((col, idx) => {

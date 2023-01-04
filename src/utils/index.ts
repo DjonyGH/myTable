@@ -1,10 +1,10 @@
-import { TObject, TValueRowSpanObject } from '../types'
+import { TRow, TValueRowSpanObject } from '../types'
 
 export const isArray = (arg: any) => {
   return Object.prototype.toString.call(arg) === '[object Array]'
 }
 
-export const isTObject = (arg: any) => {
+export const isTRow = (arg: any) => {
   return (
     Object.prototype.toString.call(arg) === '[object String]' ||
     Object.prototype.toString.call(arg) === '[object Number]' ||
@@ -15,15 +15,15 @@ export const isTObject = (arg: any) => {
 type TGetValueRowSpanObject = (obj: Object) => TValueRowSpanObject
 
 export const getValueRowSpanObject: TGetValueRowSpanObject = (obj) => {
-  const resultObject: TValueRowSpanObject = {}
+  const resulTRow: TValueRowSpanObject = {}
   ;(Object.keys(obj) as (keyof typeof obj)[]).forEach((key: keyof typeof obj) => {
-    if (isTObject(obj[key])) {
+    if (isTRow(obj[key])) {
       //@ts-ignore
-      resultObject[key] = { value: obj[key], rowSpan: 1 }
+      resulTRow[key] = { value: obj[key], rowSpan: 1 }
     }
   })
 
-  return resultObject
+  return resulTRow
 }
 
 type TIncrementRowSpan = (obj: TValueRowSpanObject, acc: TValueRowSpanObject[]) => void
@@ -45,19 +45,19 @@ export const incrementRowSpan: TIncrementRowSpan = (obj, acc) => {
     })
 }
 
-type TPrepareRows = (rows: TObject[]) => TValueRowSpanObject[]
+type TPrepareRows = (rows: TRow[]) => TValueRowSpanObject[]
 
 export const prepareRows: TPrepareRows = (rows) => {
-  return rows.reduce((acc: TValueRowSpanObject[], row: TObject) => {
+  return rows.reduce((acc: TValueRowSpanObject[], row: TRow) => {
     const el1 = getValueRowSpanObject(row)
 
     if ('items' in row) {
-      row.items?.forEach((item: TObject, index: number) => {
+      row.items?.forEach((item: TRow, index: number) => {
         const r2 = getValueRowSpanObject(item)
         if ('items' in item) {
           // Если внутри items есть items
           if (!index) {
-            item.items.forEach((it: TObject, idx: number) => {
+            item.items?.forEach((it: TRow, idx: number) => {
               const r3 = getValueRowSpanObject(it)
               if (!idx) {
                 acc.push({ ...el1, ...r2, ...r3 })
@@ -68,7 +68,7 @@ export const prepareRows: TPrepareRows = (rows) => {
               }
             })
           } else {
-            item.items.forEach((it: TObject, idx: number) => {
+            item.items?.forEach((it: TRow, idx: number) => {
               const r3 = getValueRowSpanObject(it)
               if (!idx) {
                 acc.push({ ...r2, ...r3 })
