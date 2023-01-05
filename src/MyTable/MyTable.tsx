@@ -3,6 +3,7 @@ import { IColumn, TFilterMode, TRow, TValue, TValueRowSpanObject } from '../type
 import { prepareRows } from '../utils'
 import styles from './MyTable.module.css'
 import './myTable.css'
+import { useFilter } from '../hooks/useFilter'
 
 interface IProps {
   rows: TRow[]
@@ -27,42 +28,9 @@ export const MyTable: React.FC<IProps> = ({
   rowStylePrepare,
   filterCellStyle,
 }) => {
-  const [filterValue, setFilterValue] = useState<{ [key: string]: { mode: TFilterMode; value: TValue } } | undefined>()
+  const [filterValue, getFilterInput] = useFilter()
 
   const preparedRows = prepareRows(rows)
-
-  const getFilterInputs: (columnName: string) => { [key: string]: JSX.Element } = (columnName) => ({
-    startWith: (
-      <input
-        type='text'
-        className='filter_input'
-        name={columnName}
-        placeholder='Начинается с ...'
-        onBlur={(e) => {
-          if (!e.target.value || filterValue?.[e.target.name]?.value === e.target.value) return
-          setFilterValue({
-            ...filterValue,
-            [e.target.name]: { mode: 'startWith', value: e.target.value },
-          })
-        }}
-      />
-    ),
-    contains: (
-      <input
-        type='text'
-        className='filter_input'
-        name={columnName}
-        placeholder='Содержит ...'
-        onBlur={(e) => {
-          if (!e.target.value || filterValue?.[e.target.name]?.value === e.target.value) return
-          setFilterValue({
-            ...filterValue,
-            [e.target.name]: { mode: 'contains', value: e.target.value },
-          })
-        }}
-      />
-    ),
-  })
 
   useEffect(() => {
     filterValue && console.log('load new data with filter:', filterValue)
@@ -88,7 +56,7 @@ export const MyTable: React.FC<IProps> = ({
             {columns &&
               columns.map((col, idx) => (
                 <td style={filterCellStyle} key={idx}>
-                  {col.filter?.mode && getFilterInputs(col.name)[col.filter.mode]}
+                  {col.filter?.mode && getFilterInput(col.name, col.filter.mode)}
                 </td>
               ))}
           </tr>
