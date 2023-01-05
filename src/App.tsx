@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import { data1 } from './data/data1'
+// import { data1 } from './data/data1'
 import { data2 } from './data/data2'
-import { data3 } from './data/data3'
-import { data4 } from './data/data4'
+// import { data3 } from './data/data3'
+// import { data4 } from './data/data4'
 import { MyTable } from './MyTable/MyTable'
-import { IColumn, TValueRowSpanObject } from './types'
+import { IColumn, TFilterValue, TValueRowSpanObject } from './types'
 
 function App() {
   const [filterVisible, setFilterVisible] = useState<boolean>(false)
@@ -19,19 +19,19 @@ function App() {
       name: 'benefitCode',
       title: 'Код',
       width: 200,
-      filter: { mode: 'startWith' },
+      filterMode: 'select',
     },
     {
       name: 'benefitName',
       title: 'Наименование',
       width: 200,
-      filter: { mode: 'contains' },
+      filterMode: 'contains',
     },
     {
       name: 'benefitValue',
       title: 'Величина льготы',
       width: 200,
-      filter: { mode: 'fromTo' },
+      filterMode: 'fromTo',
     },
     {
       name: 'isApplied',
@@ -65,7 +65,7 @@ function App() {
     border: '1px solid hsl(220deg, 6%, 80%)',
   }
 
-  const rowStylePrepare = (row: TValueRowSpanObject) => {
+  const onRowStylePrepare = (row: TValueRowSpanObject) => {
     if (row.id.value === 1) {
       return { backgroundColor: '#aeb1b7' }
     }
@@ -74,6 +74,8 @@ function App() {
   const filterCellStyle: React.CSSProperties = {
     border: '1px solid hsl(220deg, 6%, 80%)',
   }
+
+  const onLoadData = (filterValue: TFilterValue) => console.log('load new data with filter:', filterValue)
 
   return (
     <div className='App'>
@@ -88,8 +90,9 @@ function App() {
         tableStyle={tableStyle}
         thStyle={thStyle}
         tdStyle={tdStyle}
-        rowStylePrepare={rowStylePrepare}
         filterCellStyle={filterCellStyle}
+        onRowStylePrepare={onRowStylePrepare}
+        onLoadData={onLoadData}
       />
       {/* <h1>Таблица 3</h1>
       <MyTable rows={data3} />

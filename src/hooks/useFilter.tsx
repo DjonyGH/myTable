@@ -1,14 +1,13 @@
+import { debounce } from 'lodash'
 import { useState } from 'react'
-import { TFilterMode, TValue } from '../types'
+import { TFilterMode, TFilterValue, TGetFilterInput } from '../types'
 
-type TGetFilterInput = (columnName: string, filterMode: TFilterMode) => JSX.Element
-type TFilterValue = { [key: string]: { mode: TFilterMode; value: TValue } } | undefined
-type TUseFilter = () => [TFilterValue, TGetFilterInput]
+export type TUseFilter = () => [TFilterValue, TGetFilterInput]
 
 export const useFilter: TUseFilter = () => {
   const [filterValue, setFilterValue] = useState<TFilterValue>()
 
-  const getFilterInput: TGetFilterInput = (columnName, filterMode) => {
+  const getFilterInput: TGetFilterInput = (columnName, filterMode, availableValues) => {
     const filters: Record<TFilterMode, JSX.Element> = {
       startWith: (
         <input
@@ -16,13 +15,12 @@ export const useFilter: TUseFilter = () => {
           className='filter_input'
           name={columnName}
           placeholder='Начинается с ...'
-          onBlur={(e) => {
-            if (!e.target.value || filterValue?.[e.target.name]?.value === e.target.value) return
+          onInput={debounce((e: React.ChangeEvent<HTMLInputElement>) => {
             setFilterValue({
               ...filterValue,
               [e.target.name]: { mode: 'startWith', value: e.target.value },
             })
-          }}
+          }, 1000)}
         />
       ),
       contains: (
@@ -31,16 +29,33 @@ export const useFilter: TUseFilter = () => {
           className='filter_input'
           name={columnName}
           placeholder='Содержит ...'
-          onBlur={(e) => {
-            if (!e.target.value || filterValue?.[e.target.name]?.value === e.target.value) return
+          onInput={debounce((e: React.ChangeEvent<HTMLInputElement>) => {
             setFilterValue({
               ...filterValue,
               [e.target.name]: { mode: 'contains', value: e.target.value },
             })
-          }}
+          }, 1000)}
         />
       ),
-      select: <></>,
+      select: (
+        <select
+          className='filter_input'
+          name={columnName}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+            setFilterValue({
+              ...filterValue,
+              [e.target.name]: { mode: 'select', value: e.target.value },
+            })
+          }}
+        >
+          <option defaultChecked key={-1}>
+            Все
+          </option>
+          {availableValues?.map((item, idx) => (
+            <option key={idx}>{item}</option>
+          ))}
+        </select>
+      ),
       fromTo: <></>,
       equal: <></>,
     }

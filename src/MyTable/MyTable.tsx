@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { IColumn, TFilterMode, TRow, TValue, TValueRowSpanObject } from '../types'
+import React, { useEffect } from 'react'
+import { IColumn, TRow, TValueRowSpanObject, TFilterValue } from '../types'
 import { prepareRows } from '../utils'
 import styles from './MyTable.module.css'
 import './myTable.css'
@@ -9,32 +9,36 @@ interface IProps {
   rows: TRow[]
   columns?: IColumn[]
   filterEnabled?: boolean
+  filterAvailableValues?: Record<string, string[]>
   rowHeight?: number
   tableStyle?: React.CSSProperties
   thStyle?: React.CSSProperties
   tdStyle?: React.CSSProperties
-  rowStylePrepare?: (row: TValueRowSpanObject, rowIndex?: number) => React.CSSProperties | undefined
   filterCellStyle?: React.CSSProperties
+  onRowStylePrepare?: (row: TValueRowSpanObject, rowIndex?: number) => React.CSSProperties | undefined
+  onLoadData?: (filterValue: TFilterValue) => void
 }
 
 export const MyTable: React.FC<IProps> = ({
   columns,
   rows,
   filterEnabled,
+  filterAvailableValues,
   rowHeight,
   tableStyle,
   thStyle,
   tdStyle,
-  rowStylePrepare,
   filterCellStyle,
+  onRowStylePrepare,
+  onLoadData,
 }) => {
   const [filterValue, getFilterInput] = useFilter()
 
   const preparedRows = prepareRows(rows)
 
   useEffect(() => {
-    filterValue && console.log('load new data with filter:', filterValue)
-  }, [filterValue])
+    filterValue && onLoadData?.(filterValue)
+  }, [filterValue]) //eslint-disable-line
 
   return (
     <table style={tableStyle}>
@@ -56,7 +60,7 @@ export const MyTable: React.FC<IProps> = ({
             {columns &&
               columns.map((col, idx) => (
                 <td style={filterCellStyle} key={idx}>
-                  {col.filter?.mode && getFilterInput(col.name, col.filter.mode)}
+                  {col.filterMode && getFilterInput(col.name, col.filterMode, filterAvailableValues?.[col.name])}
                 </td>
               ))}
           </tr>
@@ -64,7 +68,7 @@ export const MyTable: React.FC<IProps> = ({
 
         {/* Строки */}
         {preparedRows.map((row: TValueRowSpanObject, idx: number) => (
-          <tr key={idx} style={{ ...rowStylePrepare?.(row), height: rowHeight ? `${rowHeight}px` : 'auto' }}>
+          <tr key={idx} style={{ ...onRowStylePrepare?.(row), height: rowHeight ? `${rowHeight}px` : 'auto' }}>
             {columns
               ? columns.map((col, idx) => {
                   if (col.name in row) {
