@@ -1,11 +1,10 @@
-import { debounce } from 'lodash'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FilterFromToInput } from '../components/FilterFromToInput'
 import { FilterSelectInput } from '../components/FilterSelectInput'
 import { FilterTextInput } from '../components/FilterTextInput'
-import { TFilterMode, TFilterValue, TGetFilterInput, TValueFromTo } from '../types'
+import { TFilterMode, TFilterValue, TGetFilterInput } from '../types'
 
-export type TUseFilter = () => [TFilterValue, TGetFilterInput]
+export type TUseFilter = () => [TFilterValue, TGetFilterInput, () => void]
 
 export const useFilter: TUseFilter = () => {
   const [filterValue, setFilterValue] = useState<TFilterValue>()
@@ -53,5 +52,13 @@ export const useFilter: TUseFilter = () => {
     return filters[filterMode]
   }
 
-  return [filterValue, getFilterInput]
+  const cleanFilter = () => {
+    setFilterValue({})
+  }
+
+  useEffect(() => {
+    if (filterValue && Object.keys(filterValue).length === 0) setFilterValue(undefined)
+  }, [filterValue])
+
+  return [filterValue, getFilterInput, cleanFilter]
 }

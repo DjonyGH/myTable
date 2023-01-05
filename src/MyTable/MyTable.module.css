@@ -10,3 +10,17 @@
 .filterRow {
   height: 30px;
 }
+.sortButton {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+.sortButtonDesc {
+  transform: rotate(180deg);
+}
+.sortActive {
+  background-color: aquamarine;
+}

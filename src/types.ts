@@ -12,12 +12,19 @@ export type TFilterMode = 'startWith' | 'contains' | 'select' | 'fromTo' | 'equa
 export type TGetFilterInput = (columnName: string, filterMode: TFilterMode, availableValues?: string[]) => JSX.Element
 export type TFilterValue = { [key: string]: { mode: TFilterMode; value: TValue | TValueFromTo } } | undefined
 
+export type TOnSort = (columnName: string) => void
+export enum ESortMode {
+  ASC = 'asc',
+  DESC = 'desc',
+}
+
 export interface IColumn {
   name: string
   title: string
   width?: number
   cellRender?: (cellValue: TValue, row?: TValueRowSpanObject) => JSX.Element
   filterMode?: TFilterMode
+  sortEnabled?: boolean
   // filter?: { mode: TFilterMode; availableValues?: string[] }
   // type: 'string' | 'number' | 'boolean'
 }

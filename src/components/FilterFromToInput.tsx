@@ -1,5 +1,5 @@
 import { debounce } from 'lodash'
-import { TFilterMode, TFilterValue, TValueFromTo } from '../types'
+import { TFilterValue, TValueFromTo } from '../types'
 
 interface IProps {
   columnName: string

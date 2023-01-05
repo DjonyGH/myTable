@@ -1,19 +1,22 @@
 import React, { useState } from 'react'
+import { flushSync } from 'react-dom'
 // import { data1 } from './data/data1'
 import { data2 } from './data/data2'
 // import { data3 } from './data/data3'
 // import { data4 } from './data/data4'
 import { MyTable } from './MyTable/MyTable'
-import { IColumn, TFilterValue, TValueRowSpanObject } from './types'
+import { ESortMode, IColumn, TFilterValue, TValueRowSpanObject } from './types'
 
 function App() {
   const [filterVisible, setFilterVisible] = useState<boolean>(false)
+  const [filterReset, setFilterReset] = useState<boolean>(false)
 
   const columns: IColumn[] = [
     {
       name: 'id',
       title: 'ID',
       width: 50,
+      sortEnabled: true,
     },
     {
       name: 'benefitCode',
@@ -32,6 +35,7 @@ function App() {
       title: 'Величина льготы',
       width: 200,
       filterMode: 'fromTo',
+      sortEnabled: true,
     },
     {
       name: 'isApplied',
@@ -81,9 +85,15 @@ function App() {
 
   const onLoadData = (filterValue: TFilterValue) => console.log('load new data with filter:', filterValue)
 
+  const onReset = () => {
+    flushSync(() => setFilterReset(true))
+    setFilterReset(false)
+  }
+
   return (
     <div className='App'>
       <button onClick={() => setFilterVisible((prevValue) => !prevValue)}>Показать фильтр</button>
+      <button onClick={onReset}>Сбросить фильтр</button>
       {/* <h1>Таблица 1</h1>
       <MyTable rows={data1} /> */}
       <h1>Таблица 2</h1>
@@ -98,6 +108,8 @@ function App() {
         filterCellStyle={filterCellStyle}
         onRowStylePrepare={onRowStylePrepare}
         onLoadData={onLoadData}
+        resetFilter={filterReset}
+        defaultSort={{ columnName: 'id', mode: ESortMode.ASC }}
       />
       {/* <h1>Таблица 3</h1>
       <MyTable rows={data3} />

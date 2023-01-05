@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import { IColumn, TRow, TValueRowSpanObject, TFilterValue } from '../types'
+import React, { useEffect, useState } from 'react'
+import { IColumn, TRow, TValueRowSpanObject, TFilterValue, TOnSort, ESortMode } from '../types'
 import { prepareRows } from '../utils'
 import styles from './MyTable.module.css'
 import './myTable.css'
@@ -17,6 +17,8 @@ interface IProps {
   filterCellStyle?: React.CSSProperties
   onRowStylePrepare?: (row: TValueRowSpanObject, rowIndex?: number) => React.CSSProperties | undefined
   onLoadData?: (filterValue: TFilterValue) => void
+  resetFilter?: boolean
+  defaultSort?: { columnName: string; mode: ESortMode }
 }
 
 export const MyTable: React.FC<IProps> = ({
@@ -31,8 +33,13 @@ export const MyTable: React.FC<IProps> = ({
   filterCellStyle,
   onRowStylePrepare,
   onLoadData,
+  resetFilter,
+  defaultSort,
 }) => {
-  const [filterValue, getFilterInput] = useFilter()
+  const [filterValue, getFilterInput, cleanFilter] = useFilter()
+
+  const [sortMode, setSortMode] = useState<ESortMode>(defaultSort?.mode || ESortMode.ASC)
+  const [sortedColumnName, setSortedColumnName] = useState<string>(defaultSort?.columnName || '')
 
   const preparedRows = prepareRows(rows)
 
@@ -40,14 +47,43 @@ export const MyTable: React.FC<IProps> = ({
     filterValue && onLoadData?.(filterValue)
   }, [filterValue]) //eslint-disable-line
 
+  useEffect(() => {
+    resetFilter && cleanFilter()
+  }, [resetFilter]) //eslint-disable-line
+
+  const onSort: TOnSort = (columnName) => {
+    setSortMode((prevState) => (prevState === ESortMode.ASC ? ESortMode.DESC : ESortMode.ASC))
+    setSortedColumnName(columnName)
+  }
+
+  sortedColumnName &&
+    preparedRows.sort((a, b) => {
+      if (sortedColumnName in a && sortedColumnName in b) {
+        if (a[sortedColumnName].value > b[sortedColumnName].value) return sortMode === ESortMode.ASC ? 1 : -1
+        else if (a[sortedColumnName].value === b[sortedColumnName].value) return 0
+        return sortMode === ESortMode.ASC ? -1 : 1
+      }
+      return 0
+    })
+
   return (
     <table style={tableStyle}>
       <thead>
         <tr>
           {columns &&
             columns.map((col, idx) => (
-              <th style={{ ...thStyle, width: `${col.width}px` }} key={idx}>
+              <th style={{ ...thStyle, width: `${col.width}px`, position: 'relative' }} key={idx}>
                 {col.title}
+                {col.sortEnabled && (
+                  <button
+                    className={`${styles.sortButton} ${sortMode === ESortMode.DESC ? styles.sortButtonDesc : ''} ${
+                      sortedColumnName === col.name ? styles.sortActive : ''
+                    }`}
+                    onClick={() => onSort(col.name)}
+                  >
+                    V
+                  </button>
+                )}
               </th>
             ))}
         </tr>
