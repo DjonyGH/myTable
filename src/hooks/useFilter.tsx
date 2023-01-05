@@ -1,6 +1,6 @@
 import { debounce } from 'lodash'
 import { useState } from 'react'
-import { TFilterMode, TFilterValue, TGetFilterInput } from '../types'
+import { TFilterMode, TFilterValue, TGetFilterInput, TValueFromTo } from '../types'
 
 export type TUseFilter = () => [TFilterValue, TGetFilterInput]
 
@@ -56,7 +56,42 @@ export const useFilter: TUseFilter = () => {
           ))}
         </select>
       ),
-      fromTo: <></>,
+      fromTo: (
+        <>
+          <input
+            type='number'
+            className='filter_input_50'
+            name={columnName}
+            placeholder='От ...'
+            onInput={debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+              const to: number | undefined = (filterValue?.[columnName]?.value as TValueFromTo)?.[1]
+              setFilterValue({
+                ...filterValue,
+                [e.target.name]: {
+                  mode: 'fromTo',
+                  value: [+e.target.value, to],
+                },
+              })
+            }, 1000)}
+          />
+          <input
+            type='number'
+            className='filter_input_50'
+            name={columnName}
+            placeholder='До ...'
+            onInput={debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+              const from: number | undefined = (filterValue?.[columnName]?.value as TValueFromTo)?.[0]
+              setFilterValue({
+                ...filterValue,
+                [e.target.name]: {
+                  mode: 'fromTo',
+                  value: [from, +e.target.value],
+                },
+              })
+            }, 1000)}
+          />
+        </>
+      ),
       equal: <></>,
     }
 

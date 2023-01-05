@@ -1,4 +1,5 @@
 export type TValue = string | number | boolean
+export type TValueFromTo = [number | undefined, number | undefined]
 
 export type TRow = {
   [key: string]: unknown
@@ -9,7 +10,7 @@ export type TValueRowSpanObject = { [key: string]: { value: TValue; rowSpan: num
 
 export type TFilterMode = 'startWith' | 'contains' | 'select' | 'fromTo' | 'equal'
 export type TGetFilterInput = (columnName: string, filterMode: TFilterMode, availableValues?: string[]) => JSX.Element
-export type TFilterValue = { [key: string]: { mode: TFilterMode; value: TValue } } | undefined
+export type TFilterValue = { [key: string]: { mode: TFilterMode; value: TValue | TValueFromTo } } | undefined
 
 export interface IColumn {
   name: string

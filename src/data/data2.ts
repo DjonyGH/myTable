@@ -13,4 +13,25 @@ export const data2 = [
     benefitValue: 20555,
     isApplied: false,
   },
+  {
+    id: 3,
+    benefitCode: 'Код льготы 3',
+    benefitName: 'Наменование льготы 3',
+    benefitValue: 30555,
+    isApplied: false,
+  },
+  {
+    id: 4,
+    benefitCode: 'Код льготы 4',
+    benefitName: 'Наменование льготы 4',
+    benefitValue: 40555,
+    isApplied: false,
+  },
+  {
+    id: 5,
+    benefitCode: 'Код льготы 5',
+    benefitName: 'Наменование льготы 5',
+    benefitValue: 50555,
+    isApplied: false,
+  },
 ]

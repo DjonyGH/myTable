@@ -75,6 +75,10 @@ function App() {
     border: '1px solid hsl(220deg, 6%, 80%)',
   }
 
+  const filterAvailableValues = {
+    benefitCode: ['Код льготы 1', 'Код льготы 2'],
+  }
+
   const onLoadData = (filterValue: TFilterValue) => console.log('load new data with filter:', filterValue)
 
   return (
@@ -87,6 +91,7 @@ function App() {
         columns={columns}
         rows={data2}
         filterEnabled={filterVisible}
+        filterAvailableValues={filterAvailableValues}
         tableStyle={tableStyle}
         thStyle={thStyle}
         tdStyle={tdStyle}

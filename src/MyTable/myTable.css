@@ -5,3 +5,11 @@
   padding: 0 5px;
   border-radius: 0;
 }
+
+.filter_input_50 {
+  width: calc(50% - 14px);
+  border: none;
+  outline: none;
+  padding: 0 5px;
+  border-radius: 0;
+}
