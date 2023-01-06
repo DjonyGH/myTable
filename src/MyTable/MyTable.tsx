@@ -66,12 +66,20 @@ export const MyTable: React.FC<IProps> = ({
       return 0
     })
 
+  let preparedColumns: IColumn[] = []
+
+  if ((!columns || !columns.length) && preparedRows[0]) {
+    preparedColumns = Object.keys(preparedRows[0]).map((item) => ({ name: item, title: item }))
+  } else {
+    columns && (preparedColumns = columns)
+  }
+
   return (
     <table style={tableStyle}>
       <thead>
         <tr>
-          {columns &&
-            columns.map((col, idx) => (
+          {preparedColumns &&
+            preparedColumns.map((col, idx) => (
               <th style={{ ...thStyle, width: `${col.width}px`, position: 'relative' }} key={idx}>
                 {col.title}
                 {col.sortEnabled && (
@@ -81,7 +89,7 @@ export const MyTable: React.FC<IProps> = ({
                     }`}
                     onClick={() => onSort(col.name)}
                   >
-                    V
+                    {'>'}
                   </button>
                 )}
               </th>

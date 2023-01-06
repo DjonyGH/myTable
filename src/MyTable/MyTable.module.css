@@ -17,9 +17,10 @@
   border: none;
   outline: none;
   cursor: pointer;
+  transform: rotate(90deg);
 }
 .sortButtonDesc {
-  transform: rotate(180deg);
+  transform: rotate(270deg);
 }
 .sortActive {
   background-color: aquamarine;
