@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { IColumn, TRow, TPreparedRow, TFilterValue, TOnSort, ESortMode } from '../types'
 import { prepareColumns, prepareRows } from '../utils'
-import styles from './MyTable.module.css'
+import s from './MyTable.module.css'
 import './myTable.css'
 import { useFilter } from '../hooks/useFilter'
 
@@ -10,15 +10,21 @@ interface IProps {
   columns?: IColumn[]
   filterEnabled?: boolean
   filterAvailableValues?: Record<string, string[]>
-  rowHeight?: number
-  tableStyle?: React.CSSProperties
-  thStyle?: React.CSSProperties
-  tdStyle?: React.CSSProperties
-  filterCellStyle?: React.CSSProperties
-  onRowStylePrepare?: (row: TPreparedRow, rowIndex?: number) => React.CSSProperties | undefined
+  width?: number
+  styles?: {
+    header?: React.CSSProperties
+    table?: React.CSSProperties
+    th?: React.CSSProperties
+    td?: React.CSSProperties
+    filterCell?: React.CSSProperties
+    footer?: React.CSSProperties
+    onRowPrepare?: (row: TPreparedRow, rowIndex?: number) => React.CSSProperties | undefined
+  }
   onLoadData?: (filterValue: TFilterValue) => void
   resetFilter?: boolean
   defaultSort?: { columnName: string; mode: ESortMode }
+  headerJSX?: JSX.Element
+  footerJSX?: JSX.Element
 }
 
 export const MyTable: React.FC<IProps> = ({
@@ -26,15 +32,13 @@ export const MyTable: React.FC<IProps> = ({
   rows,
   filterEnabled,
   filterAvailableValues,
-  rowHeight,
-  tableStyle,
-  thStyle,
-  tdStyle,
-  filterCellStyle,
-  onRowStylePrepare,
+  width = 100,
+  styles,
   onLoadData,
   resetFilter,
   defaultSort,
+  headerJSX,
+  footerJSX,
 }) => {
   const [filterValue, getFilterInput, cleanFilter] = useFilter()
 
@@ -69,68 +73,72 @@ export const MyTable: React.FC<IProps> = ({
     })
 
   return (
-    <table style={tableStyle}>
-      <thead>
-        <tr>
-          {preparedColumns &&
-            preparedColumns.map((col, idx) => (
-              <th style={{ ...thStyle, width: `${col.width}px`, position: 'relative' }} key={idx}>
-                {col.title}
-                {col.sortEnabled && (
-                  <button
-                    className={`${styles.sortButton} ${sortMode === ESortMode.DESC ? styles.sortButtonDesc : ''} ${
-                      sortedColumnName === col.name ? styles.sortActive : ''
-                    }`}
-                    onClick={() => onSort(col.name)}
-                  >
-                    {'>'}
-                  </button>
-                )}
-              </th>
-            ))}
-        </tr>
-      </thead>
-
-      <tbody>
-        {/* Фильтры */}
-        {filterEnabled && (
-          <tr className={styles.filterRow}>
-            {columns &&
-              columns.map((col, idx) => (
-                <td style={filterCellStyle} key={idx}>
-                  {col.filterMode && getFilterInput(col.name, col.filterMode, filterAvailableValues?.[col.name])}
-                </td>
+    <>
+      <div style={{ ...styles?.header, width: `${width}%` }}>{headerJSX}</div>
+      <table style={{ ...styles?.table, width: `${width}%` }}>
+        <thead>
+          <tr>
+            {preparedColumns &&
+              preparedColumns.map((col, idx) => (
+                <th style={{ ...styles?.th, width: `${col.width}px`, position: 'relative' }} key={idx}>
+                  {col.title}
+                  {col.sortEnabled && (
+                    <button
+                      className={`${s.sortButton} ${sortMode === ESortMode.DESC ? s.sortButtonDesc : ''} ${
+                        sortedColumnName === col.name ? s.sortActive : ''
+                      }`}
+                      onClick={() => onSort(col.name)}
+                    >
+                      {'>'}
+                    </button>
+                  )}
+                </th>
               ))}
           </tr>
-        )}
+        </thead>
 
-        {/* Строки */}
-        {preparedRows.map((row: TPreparedRow, idx: number) => (
-          <tr key={idx} style={{ ...onRowStylePrepare?.(row), height: rowHeight ? `${rowHeight}px` : 'auto' }}>
-            {columns
-              ? columns.map((col, idx) => {
-                  if (col.name in row) {
-                    return (
-                      <td rowSpan={row[col.name]?.rowSpan} style={{ ...tdStyle }} key={idx}>
-                        {col.cellRender?.(row[col.name]?.value, row) || row[col.name]?.value}
-                      </td>
-                    )
-                  } else {
-                    return (
-                      <td style={{ ...tdStyle }} key={idx}>
-                        <i>No data</i>
-                      </td>
-                    )
-                  }
-                })
-              : (Object.keys(row) as (keyof typeof row)[]).map((fieldKey, idx) => (
-                  <td rowSpan={row[fieldKey]?.rowSpan} style={{ ...tdStyle }} key={idx}>
-                    {row[fieldKey]?.value}
+        <tbody>
+          {/* Фильтры */}
+          {filterEnabled && (
+            <tr className={s.filterRow}>
+              {columns &&
+                columns.map((col, idx) => (
+                  <td style={styles?.filterCell} key={idx}>
+                    {col.filterMode && getFilterInput(col.name, col.filterMode, filterAvailableValues?.[col.name])}
                   </td>
                 ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+            </tr>
+          )}
+
+          {/* Строки */}
+          {preparedRows.map((row: TPreparedRow, idx: number) => (
+            <tr key={idx} style={{ ...styles?.onRowPrepare?.(row) }}>
+              {columns
+                ? columns.map((col, idx) => {
+                    if (col.name in row) {
+                      return (
+                        <td rowSpan={row[col.name]?.rowSpan} style={{ ...styles?.td }} key={idx}>
+                          {col.cellRender?.(row[col.name]?.value, row) || row[col.name]?.value}
+                        </td>
+                      )
+                    } else {
+                      return (
+                        <td style={{ ...styles?.td }} key={idx}>
+                          <i>No data</i>
+                        </td>
+                      )
+                    }
+                  })
+                : (Object.keys(row) as (keyof typeof row)[]).map((fieldKey, idx) => (
+                    <td rowSpan={row[fieldKey]?.rowSpan} style={{ ...styles?.td }} key={idx}>
+                      {row[fieldKey]?.value}
+                    </td>
+                  ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div style={{ ...styles?.footer, width: `${width}%` }}>{footerJSX}</div>
+    </>
   )
 }

@@ -49,6 +49,14 @@ function App() {
         }
       },
     },
+    {
+      name: 'NoName',
+      title: 'Без имени',
+    },
+    {
+      name: 'NoName2',
+      title: 'Без имени2',
+    },
   ]
 
   const tableStyle: React.CSSProperties = {
@@ -102,11 +110,14 @@ function App() {
         rows={data2}
         filterEnabled={filterVisible}
         filterAvailableValues={filterAvailableValues}
-        tableStyle={tableStyle}
-        thStyle={thStyle}
-        tdStyle={tdStyle}
-        filterCellStyle={filterCellStyle}
-        onRowStylePrepare={onRowStylePrepare}
+        width={50}
+        styles={{
+          table: tableStyle,
+          th: thStyle,
+          td: tdStyle,
+          filterCell: filterCellStyle,
+          onRowPrepare: onRowStylePrepare,
+        }}
         onLoadData={onLoadData}
         resetFilter={filterReset}
         defaultSort={{ columnName: 'id', mode: ESortMode.ASC }}

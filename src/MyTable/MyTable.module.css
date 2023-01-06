@@ -1,5 +1,5 @@
 .table {
-  width: 50%;
+  width: 70%;
   border-collapse: collapse;
 }
 /* .row {
@@ -24,4 +24,7 @@
 }
 .sortActive {
   background-color: aquamarine;
+}
+.header {
+  height: 10px;
 }
