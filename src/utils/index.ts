@@ -1,4 +1,4 @@
-import { TRow, TValueRowSpanObject } from '../types'
+import { IColumn, TRow, TPreparedRow } from '../types'
 
 export const isArray = (arg: any) => {
   return Object.prototype.toString.call(arg) === '[object Array]'
@@ -12,10 +12,10 @@ export const isTRow = (arg: any) => {
   )
 }
 
-type TGetValueRowSpanObject = (obj: Object) => TValueRowSpanObject
+type TGetValueRowSpanObject = (obj: Object) => TPreparedRow
 
 export const getValueRowSpanObject: TGetValueRowSpanObject = (obj) => {
-  const resulTRow: TValueRowSpanObject = {}
+  const resulTRow: TPreparedRow = {}
   ;(Object.keys(obj) as (keyof typeof obj)[]).forEach((key: keyof typeof obj) => {
     if (isTRow(obj[key])) {
       //@ts-ignore
@@ -26,7 +26,7 @@ export const getValueRowSpanObject: TGetValueRowSpanObject = (obj) => {
   return resulTRow
 }
 
-type TIncrementRowSpan = (obj: TValueRowSpanObject, acc: TValueRowSpanObject[]) => void
+type TIncrementRowSpan = (obj: TPreparedRow, acc: TPreparedRow[]) => void
 
 export const incrementRowSpan: TIncrementRowSpan = (obj, acc) => {
   const reverseIndex = [...acc].reverse().findIndex((el) => {
@@ -45,10 +45,10 @@ export const incrementRowSpan: TIncrementRowSpan = (obj, acc) => {
     })
 }
 
-type TPrepareRows = (rows: TRow[]) => TValueRowSpanObject[]
+type TPrepareRows = (rows: TRow[]) => TPreparedRow[]
 
 export const prepareRows: TPrepareRows = (rows) => {
-  return rows.reduce((acc: TValueRowSpanObject[], row: TRow) => {
+  return rows.reduce((acc: TPreparedRow[], row: TRow) => {
     const el1 = getValueRowSpanObject(row)
 
     if ('items' in row) {
@@ -96,5 +96,18 @@ export const prepareRows: TPrepareRows = (rows) => {
     }
 
     return acc
-  }, [] as TValueRowSpanObject[])
+  }, [] as TPreparedRow[])
+}
+
+type TPrepareColumns = (columns: IColumn[] | undefined, rows: TPreparedRow[]) => IColumn[]
+
+export const prepareColumns: TPrepareColumns = (columns, rows) => {
+  let preparedColumns: IColumn[] = []
+
+  if ((!columns || !columns.length) && rows[0]) {
+    preparedColumns = Object.keys(rows[0]).map((item) => ({ name: item, title: item }))
+  } else {
+    columns && (preparedColumns = columns)
+  }
+  return preparedColumns
 }

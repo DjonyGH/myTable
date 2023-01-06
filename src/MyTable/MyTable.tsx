@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { IColumn, TRow, TValueRowSpanObject, TFilterValue, TOnSort, ESortMode } from '../types'
-import { prepareRows } from '../utils'
+import { IColumn, TRow, TPreparedRow, TFilterValue, TOnSort, ESortMode } from '../types'
+import { prepareColumns, prepareRows } from '../utils'
 import styles from './MyTable.module.css'
 import './myTable.css'
 import { useFilter } from '../hooks/useFilter'
@@ -15,7 +15,7 @@ interface IProps {
   thStyle?: React.CSSProperties
   tdStyle?: React.CSSProperties
   filterCellStyle?: React.CSSProperties
-  onRowStylePrepare?: (row: TValueRowSpanObject, rowIndex?: number) => React.CSSProperties | undefined
+  onRowStylePrepare?: (row: TPreparedRow, rowIndex?: number) => React.CSSProperties | undefined
   onLoadData?: (filterValue: TFilterValue) => void
   resetFilter?: boolean
   defaultSort?: { columnName: string; mode: ESortMode }
@@ -43,6 +43,8 @@ export const MyTable: React.FC<IProps> = ({
 
   const preparedRows = prepareRows(rows)
 
+  let preparedColumns: IColumn[] = prepareColumns(columns, preparedRows)
+
   useEffect(() => {
     filterValue && onLoadData?.(filterValue)
   }, [filterValue]) //eslint-disable-line
@@ -65,14 +67,6 @@ export const MyTable: React.FC<IProps> = ({
       }
       return 0
     })
-
-  let preparedColumns: IColumn[] = []
-
-  if ((!columns || !columns.length) && preparedRows[0]) {
-    preparedColumns = Object.keys(preparedRows[0]).map((item) => ({ name: item, title: item }))
-  } else {
-    columns && (preparedColumns = columns)
-  }
 
   return (
     <table style={tableStyle}>
@@ -111,7 +105,7 @@ export const MyTable: React.FC<IProps> = ({
         )}
 
         {/* Строки */}
-        {preparedRows.map((row: TValueRowSpanObject, idx: number) => (
+        {preparedRows.map((row: TPreparedRow, idx: number) => (
           <tr key={idx} style={{ ...onRowStylePrepare?.(row), height: rowHeight ? `${rowHeight}px` : 'auto' }}>
             {columns
               ? columns.map((col, idx) => {

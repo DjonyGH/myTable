@@ -5,7 +5,7 @@ import { data2 } from './data/data2'
 // import { data3 } from './data/data3'
 // import { data4 } from './data/data4'
 import { MyTable } from './MyTable/MyTable'
-import { ESortMode, IColumn, TFilterValue, TValueRowSpanObject } from './types'
+import { ESortMode, IColumn, TFilterValue, TPreparedRow } from './types'
 
 function App() {
   const [filterVisible, setFilterVisible] = useState<boolean>(false)
@@ -69,7 +69,7 @@ function App() {
     border: '1px solid hsl(220deg, 6%, 80%)',
   }
 
-  const onRowStylePrepare = (row: TValueRowSpanObject) => {
+  const onRowStylePrepare = (row: TPreparedRow) => {
     if (row.id.value === 1) {
       return { backgroundColor: '#aeb1b7' }
     }

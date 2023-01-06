@@ -6,7 +6,7 @@ export type TRow = {
   items?: TRow[]
 }
 
-export type TValueRowSpanObject = { [key: string]: { value: TValue; rowSpan: number } }
+export type TPreparedRow = { [key: string]: { value: TValue; rowSpan: number } }
 
 export type TFilterMode = 'startWith' | 'contains' | 'select' | 'fromTo' | 'equal'
 export type TGetFilterInput = (columnName: string, filterMode: TFilterMode, availableValues?: string[]) => JSX.Element
@@ -22,7 +22,7 @@ export interface IColumn {
   name: string
   title: string
   width?: number
-  cellRender?: (cellValue: TValue, row?: TValueRowSpanObject) => JSX.Element
+  cellRender?: (cellValue: TValue, row?: TPreparedRow) => JSX.Element
   filterMode?: TFilterMode
   sortEnabled?: boolean
   // filter?: { mode: TFilterMode; availableValues?: string[] }
