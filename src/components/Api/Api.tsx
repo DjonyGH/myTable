@@ -20,7 +20,7 @@ export const Api: React.FC = () => {
       name: 'type',
       title: 'Тип',
       width: 350,
-      cellRender: (cellValue, row) =>
+      cellRender: (cellValue) =>
         cellValue === 'boolean' || cellValue === 'JSX.Element' || cellValue === 'number' ? (
           <>{cellValue}</>
         ) : (

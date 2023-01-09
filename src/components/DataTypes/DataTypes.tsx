@@ -5,7 +5,7 @@ import { rows } from './data'
 import styles from './dataTypes.module.scss'
 import { ITypesTableRow } from './types'
 
-export const DataTypes: React.FC = ({}) => {
+export const DataTypes: React.FC = () => {
   const columns: IColumn<ITypesTableRow>[] = [
     {
       name: 'type',
