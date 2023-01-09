@@ -25,6 +25,4 @@ export interface IColumn {
   cellRender?: (cellValue: TValue, row?: TPreparedRow) => JSX.Element
   filterMode?: TFilterMode
   sortEnabled?: boolean
-  // filter?: { mode: TFilterMode; availableValues?: string[] }
-  // type: 'string' | 'number' | 'boolean'
 }

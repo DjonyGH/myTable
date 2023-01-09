@@ -2,8 +2,12 @@
   width: 70%;
   border-collapse: collapse;
 }
-/* .row {
-} */
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: 100%;
+}
 .cell {
   border: 1px solid black;
 }

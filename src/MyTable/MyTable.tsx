@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
-import { IColumn, TRow, TPreparedRow, TFilterValue, TOnSort, ESortMode, TValue } from '../types'
-import { prepareColumns, prepareRows } from '../utils'
+import { IColumn, TRow, TPreparedRow, TFilterValue, TOnSort, ESortMode, TValue } from './types'
+import { prepareColumns, prepareRows } from './utils'
 import s from './MyTable.module.css'
 import './myTable.css'
-import { useFilter } from '../hooks/useFilter'
+import { useFilter } from './hooks/useFilter'
 
 interface IProps {
   rows: TRow[]
@@ -34,13 +34,13 @@ interface IProps {
 export const MyTable: React.FC<IProps> = ({
   columns,
   rows,
-  filterEnabled,
+  filterEnabled = false,
   filterAvailableValues,
   width = 100,
   styles,
   onLoadData,
   onCellClick,
-  resetFilter,
+  resetFilter = false,
   defaultSort,
   headerJSX,
   footerJSX,
@@ -143,7 +143,7 @@ export const MyTable: React.FC<IProps> = ({
                           onClick={() => onCellClick?.(row[col.name]?.value, row)}
                           key={idx}
                         >
-                          <i>No data</i>
+                          {/* <i>No data</i> */}
                         </td>
                       )
                     }
