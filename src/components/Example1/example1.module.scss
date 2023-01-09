@@ -1,0 +1,13 @@
+.example1 {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+  h2 {
+    margin-left: 12px;
+  }
+  .btn {
+    width: 150px;
+    margin: 10px 10px 10px 0;
+  }
+}

@@ -15,7 +15,6 @@ code {
   height: calc(100vh - 40px);
   max-height: calc(100vh - 40px);
   overflow: scroll;
-  background-color: aqua;
   margin: 0;
   padding: 20px 20px;
   display: flex;
