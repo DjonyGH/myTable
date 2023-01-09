@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { IColumn, TRow, TPreparedRow, TFilterValue, TOnSort, ESortMode } from '../types'
+import { IColumn, TRow, TPreparedRow, TFilterValue, TOnSort, ESortMode, TValue } from '../types'
 import { prepareColumns, prepareRows } from '../utils'
 import s from './MyTable.module.css'
 import './myTable.css'
@@ -18,9 +18,13 @@ interface IProps {
     td?: React.CSSProperties
     filterCell?: React.CSSProperties
     footer?: React.CSSProperties
+    sortButton?: React.CSSProperties
+    sortButtonActive?: React.CSSProperties
+    sortButtonContent?: JSX.Element
     onRowPrepare?: (row: TPreparedRow, rowIndex?: number) => React.CSSProperties | undefined
   }
   onLoadData?: (filterValue: TFilterValue) => void
+  onCellClick?: (cellValue: TValue, row?: TPreparedRow) => void
   resetFilter?: boolean
   defaultSort?: { columnName: string; mode: ESortMode }
   headerJSX?: JSX.Element
@@ -35,6 +39,7 @@ export const MyTable: React.FC<IProps> = ({
   width = 100,
   styles,
   onLoadData,
+  onCellClick,
   resetFilter,
   defaultSort,
   headerJSX,
@@ -87,9 +92,14 @@ export const MyTable: React.FC<IProps> = ({
                       className={`${s.sortButton} ${sortMode === ESortMode.DESC ? s.sortButtonDesc : ''} ${
                         sortedColumnName === col.name ? s.sortActive : ''
                       }`}
+                      style={
+                        sortedColumnName === col.name
+                          ? { ...styles?.sortButton, ...styles?.sortButtonActive }
+                          : styles?.sortButton
+                      }
                       onClick={() => onSort(col.name)}
                     >
-                      {'>'}
+                      {styles?.sortButtonContent || '>'}
                     </button>
                   )}
                 </th>
@@ -117,20 +127,34 @@ export const MyTable: React.FC<IProps> = ({
                 ? columns.map((col, idx) => {
                     if (col.name in row) {
                       return (
-                        <td rowSpan={row[col.name]?.rowSpan} style={{ ...styles?.td }} key={idx}>
+                        <td
+                          rowSpan={row[col.name]?.rowSpan}
+                          onClick={() => onCellClick?.(row[col.name]?.value, row)}
+                          style={{ ...styles?.td }}
+                          key={idx}
+                        >
                           {col.cellRender?.(row[col.name]?.value, row) || row[col.name]?.value}
                         </td>
                       )
                     } else {
                       return (
-                        <td style={{ ...styles?.td }} key={idx}>
+                        <td
+                          style={{ ...styles?.td }}
+                          onClick={() => onCellClick?.(row[col.name]?.value, row)}
+                          key={idx}
+                        >
                           <i>No data</i>
                         </td>
                       )
                     }
                   })
                 : (Object.keys(row) as (keyof typeof row)[]).map((fieldKey, idx) => (
-                    <td rowSpan={row[fieldKey]?.rowSpan} style={{ ...styles?.td }} key={idx}>
+                    <td
+                      rowSpan={row[fieldKey]?.rowSpan}
+                      onClick={() => onCellClick?.(row[fieldKey]?.value, row)}
+                      style={{ ...styles?.td }}
+                      key={idx}
+                    >
                       {row[fieldKey]?.value}
                     </td>
                   ))}
