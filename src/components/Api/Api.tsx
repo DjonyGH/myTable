@@ -1,11 +1,12 @@
 import React from 'react'
-import { MyTable } from '../../MyTable/MyTable'
+import { MyTableFactory } from '../../MyTable/MyTableFactory'
 import { ESortMode, IColumn } from '../../MyTable/types'
 import styles from './api.module.scss'
 import { rows } from './data'
+import { IApiTableRow } from './types'
 
-export const Api: React.FC = ({}) => {
-  const columns: IColumn[] = [
+export const Api: React.FC = () => {
+  const columns: IColumn<IApiTableRow>[] = [
     {
       name: 'prop',
       title: 'Свойство',
@@ -19,7 +20,7 @@ export const Api: React.FC = ({}) => {
       name: 'type',
       title: 'Тип',
       width: 350,
-      cellRender: (cellValue) =>
+      cellRender: (cellValue, row) =>
         cellValue === 'boolean' || cellValue === 'JSX.Element' || cellValue === 'number' ? (
           <>{cellValue}</>
         ) : (
@@ -50,6 +51,8 @@ export const Api: React.FC = ({}) => {
     padding: '0 10px',
     border: '1px solid grey',
   }
+
+  const MyTable = MyTableFactory<IApiTableRow>()
 
   return (
     <section className={styles.api}>

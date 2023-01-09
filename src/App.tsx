@@ -1,13 +1,13 @@
-import React, { useState } from 'react'
-import { flushSync } from 'react-dom'
+// import React, { useState } from 'react'
+// import { flushSync } from 'react-dom'
 import { Api } from './components/Api/Api'
 import { DataTypes } from './components/DataTypes/DataTypes'
 // import { data1 } from './data/data1'
-import { data2 } from './data/data2'
+// import { data2 } from './data/data2'
 // import { data3 } from './data/data3'
 // import { data4 } from './data/data4'
-import { MyTable } from './MyTable/MyTable'
-import { ESortMode, IColumn, TFilterValue, TPreparedRow } from './MyTable/types'
+// import { MyTable } from './MyTable/MyTable'
+// import { ESortMode, IColumn, TFilterValue, TPreparedRow } from './MyTable/types'
 
 function App() {
   // const [filterVisible, setFilterVisible] = useState<boolean>(false)

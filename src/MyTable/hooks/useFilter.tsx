@@ -1,18 +1,22 @@
 import { useEffect, useState } from 'react'
-import { FilterFromToInput } from '../components/FilterFromToInput'
-import { FilterSelectInput } from '../components/FilterSelectInput'
-import { FilterTextInput } from '../components/FilterTextInput'
-import { TFilterMode, TFilterValue, TGetFilterInput } from '../types'
+import { FilterFromToInput, TFilterFromToInput } from '../components/FilterFromToInput'
+import { FilterSelectInput, TFilterSelectInput } from '../components/FilterSelectInput'
+import { FilterTextInput, TFilterTextInput } from '../components/FilterTextInput'
+import { TFilterMode, TFilterValue, TGetFilterInput, TRow } from '../types'
 
-export type TUseFilter = () => [TFilterValue, TGetFilterInput, () => void]
+export type TUseFilter = <T extends TRow>() => [TFilterValue, TGetFilterInput<T>, () => void]
 
-export const useFilter: TUseFilter = () => {
+export const useFilter: TUseFilter = <T extends TRow>() => {
   const [filterValue, setFilterValue] = useState<TFilterValue>()
 
-  const getFilterInput: TGetFilterInput = (columnName, filterMode, availableValues) => {
+  const FilterTextInputTyped = FilterTextInput as TFilterTextInput<T>
+  const FilterSelectInputTyped = FilterSelectInput as TFilterSelectInput<T>
+  const FilterFromToInputTyped = FilterFromToInput as TFilterFromToInput<T>
+
+  const getFilterInput: TGetFilterInput<T> = (columnName, filterMode, availableValues) => {
     const filters: Record<TFilterMode, JSX.Element> = {
       startWith: (
-        <FilterTextInput
+        <FilterTextInputTyped
           columnName={columnName}
           mode={filterMode}
           placeholder='Начинается с ...'
@@ -21,7 +25,7 @@ export const useFilter: TUseFilter = () => {
         />
       ),
       contains: (
-        <FilterTextInput
+        <FilterTextInputTyped
           columnName={columnName}
           mode={filterMode}
           placeholder='Содержит ...'
@@ -30,16 +34,18 @@ export const useFilter: TUseFilter = () => {
         />
       ),
       select: (
-        <FilterSelectInput
+        <FilterSelectInputTyped
           columnName={columnName}
           filterValue={filterValue}
           setFilterValue={setFilterValue}
           availableValues={availableValues || []}
         />
       ),
-      fromTo: <FilterFromToInput columnName={columnName} filterValue={filterValue} setFilterValue={setFilterValue} />,
+      fromTo: (
+        <FilterFromToInputTyped columnName={columnName} filterValue={filterValue} setFilterValue={setFilterValue} />
+      ),
       equal: (
-        <FilterTextInput
+        <FilterTextInputTyped
           columnName={columnName}
           mode={filterMode}
           placeholder='Равно ...'

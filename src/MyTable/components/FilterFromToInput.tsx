@@ -1,19 +1,21 @@
 import { debounce } from 'lodash'
-import { TFilterValue, TValueFromTo } from '../types'
+import { TFilterValue, TRow, TValueFromTo } from '../types'
 
-interface IProps {
-  columnName: string
+interface IProps<T> {
+  columnName: keyof T
   filterValue: TFilterValue
   setFilterValue: (filterValue: TFilterValue) => void
 }
 
-export const FilterFromToInput: React.FC<IProps> = ({ columnName, filterValue, setFilterValue }) => {
+export type TFilterFromToInput<T = TRow> = React.FC<IProps<T>>
+
+export const FilterFromToInput: TFilterFromToInput = ({ columnName, filterValue, setFilterValue }) => {
   return (
     <>
       <input
         type='number'
         className='filter_input_50'
-        name={columnName}
+        name={columnName as string}
         placeholder='От ...'
         onInput={debounce((e: React.ChangeEvent<HTMLInputElement>) => {
           const to: number | undefined = (filterValue?.[columnName]?.value as TValueFromTo)?.[1]
@@ -29,7 +31,7 @@ export const FilterFromToInput: React.FC<IProps> = ({ columnName, filterValue, s
       <input
         type='number'
         className='filter_input_50'
-        name={columnName}
+        name={columnName as string}
         placeholder='До ...'
         onInput={debounce((e: React.ChangeEvent<HTMLInputElement>) => {
           const from: number | undefined = (filterValue?.[columnName]?.value as TValueFromTo)?.[0]

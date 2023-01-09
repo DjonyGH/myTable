@@ -1,11 +1,12 @@
 import React from 'react'
-import { MyTable } from '../../MyTable/MyTable'
+import { MyTableFactory } from '../../MyTable/MyTableFactory'
 import { ESortMode, IColumn } from '../../MyTable/types'
 import { rows } from './data'
 import styles from './dataTypes.module.scss'
+import { ITypesTableRow } from './types'
 
 export const DataTypes: React.FC = ({}) => {
-  const columns: IColumn[] = [
+  const columns: IColumn<ITypesTableRow>[] = [
     {
       name: 'type',
       title: 'Тип',
@@ -36,6 +37,8 @@ export const DataTypes: React.FC = ({}) => {
     padding: '0 10px',
     border: '1px solid grey',
   }
+
+  const MyTable = MyTableFactory<ITypesTableRow>()
 
   return (
     <section className={styles.types}>

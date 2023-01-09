@@ -12,10 +12,10 @@ export const isTRow = (arg: any) => {
   )
 }
 
-type TGetValueRowSpanObject = (obj: Object) => TPreparedRow
+type TGetValueRowSpanObject = <T extends TRow>(obj: Object) => TPreparedRow<T>
 
-export const getValueRowSpanObject: TGetValueRowSpanObject = (obj) => {
-  const resulTRow: TPreparedRow = {}
+export const getValueRowSpanObject: TGetValueRowSpanObject = <T extends TRow>(obj: Object) => {
+  const resulTRow: TPreparedRow<T> = {} as TPreparedRow<T>
   ;(Object.keys(obj) as (keyof typeof obj)[]).forEach((key: keyof typeof obj) => {
     if (isTRow(obj[key])) {
       //@ts-ignore
@@ -26,9 +26,9 @@ export const getValueRowSpanObject: TGetValueRowSpanObject = (obj) => {
   return resulTRow
 }
 
-type TIncrementRowSpan = (obj: TPreparedRow, acc: TPreparedRow[]) => void
+type TIncrementRowSpan = <T extends TRow>(obj: TPreparedRow<T>, acc: TPreparedRow<T>[]) => void
 
-export const incrementRowSpan: TIncrementRowSpan = (obj, acc) => {
+export const incrementRowSpan: TIncrementRowSpan = <T extends TRow>(obj: TPreparedRow<T>, acc: TPreparedRow<T>[]) => {
   const reverseIndex = [...acc].reverse().findIndex((el) => {
     let condition: number = 0
     Object.keys(obj).forEach((key) => {
@@ -45,38 +45,38 @@ export const incrementRowSpan: TIncrementRowSpan = (obj, acc) => {
     })
 }
 
-type TPrepareRows = (rows: TRow[]) => TPreparedRow[]
+type TPrepareRows = <T extends TRow>(rows: TRow[]) => TPreparedRow<T>[]
 
-export const prepareRows: TPrepareRows = (rows) => {
-  return rows.reduce((acc: TPreparedRow[], row: TRow) => {
-    const el1 = getValueRowSpanObject(row)
+export const prepareRows: TPrepareRows = <T extends TRow>(rows: TRow[]) => {
+  return rows.reduce((acc: TPreparedRow<T>[], row: TRow) => {
+    const el1 = getValueRowSpanObject<T>(row)
 
     if ('items' in row) {
       row.items?.forEach((item: TRow, index: number) => {
-        const r2 = getValueRowSpanObject(item)
+        const r2 = getValueRowSpanObject<T>(item)
         if ('items' in item) {
           // Если внутри items есть items
           if (!index) {
             item.items?.forEach((it: TRow, idx: number) => {
-              const r3 = getValueRowSpanObject(it)
+              const r3 = getValueRowSpanObject<T>(it)
               if (!idx) {
                 acc.push({ ...el1, ...r2, ...r3 })
               } else {
                 acc.push(r3)
-                incrementRowSpan(el1, acc)
-                incrementRowSpan(r2, acc)
+                incrementRowSpan<T>(el1, acc)
+                incrementRowSpan<T>(r2, acc)
               }
             })
           } else {
             item.items?.forEach((it: TRow, idx: number) => {
-              const r3 = getValueRowSpanObject(it)
+              const r3 = getValueRowSpanObject<T>(it)
               if (!idx) {
                 acc.push({ ...r2, ...r3 })
-                incrementRowSpan(el1, acc)
+                incrementRowSpan<T>(el1, acc)
               } else {
                 acc.push(r3)
-                incrementRowSpan(el1, acc)
-                incrementRowSpan(r2, acc)
+                incrementRowSpan<T>(el1, acc)
+                incrementRowSpan<T>(r2, acc)
               }
             })
           }
@@ -86,23 +86,26 @@ export const prepareRows: TPrepareRows = (rows) => {
             acc.push({ ...el1, ...r2 })
           } else {
             acc.push(r2)
-            incrementRowSpan(el1, acc)
+            incrementRowSpan<T>(el1, acc)
           }
         }
       })
     } else {
-      const valueRowSpanObj = getValueRowSpanObject(row)
+      const valueRowSpanObj = getValueRowSpanObject<T>(row)
       acc.push(valueRowSpanObj)
     }
 
     return acc
-  }, [] as TPreparedRow[])
+  }, [] as TPreparedRow<T>[])
 }
 
-type TPrepareColumns = (columns: IColumn[] | undefined, rows: TPreparedRow[]) => IColumn[]
+type TPrepareColumns = <T extends TRow>(columns: IColumn<T>[] | undefined, rows: TPreparedRow<T>[]) => IColumn<T>[]
 
-export const prepareColumns: TPrepareColumns = (columns, rows) => {
-  let preparedColumns: IColumn[] = []
+export const prepareColumns: TPrepareColumns = <T extends TRow>(
+  columns: IColumn<T>[] | undefined,
+  rows: TPreparedRow<T>[]
+) => {
+  let preparedColumns: IColumn<T>[] = []
 
   if ((!columns || !columns.length) && rows[0]) {
     preparedColumns = Object.keys(rows[0]).map((item) => ({ name: item, title: item }))

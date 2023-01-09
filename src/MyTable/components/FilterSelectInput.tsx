@@ -1,17 +1,19 @@
-import { TFilterValue } from '../types'
+import { TFilterValue, TRow } from '../types'
 
-interface IProps {
-  columnName: string
+interface IProps<T> {
+  columnName: keyof T
   filterValue: TFilterValue
   setFilterValue: (filterValue: TFilterValue) => void
   availableValues: string[]
 }
 
-export const FilterSelectInput: React.FC<IProps> = ({ columnName, filterValue, setFilterValue, availableValues }) => {
+export type TFilterSelectInput<T = TRow> = React.FC<IProps<T>>
+
+export const FilterSelectInput: TFilterSelectInput = ({ columnName, filterValue, setFilterValue, availableValues }) => {
   return (
     <select
       className='filter_input'
-      name={columnName}
+      name={columnName as string}
       onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
         setFilterValue({
           ...filterValue,
