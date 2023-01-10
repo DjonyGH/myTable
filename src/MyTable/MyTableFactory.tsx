@@ -10,6 +10,7 @@ interface IProps<T extends TRow> {
   columns?: IColumn<T>[]
   filterEnabled?: boolean
   filterAvailableValues?: Record<keyof T, string[]>
+  defaultFilter?: TFilterValue<T>
   width?: number
   styles?: {
     header?: React.CSSProperties
@@ -23,9 +24,9 @@ interface IProps<T extends TRow> {
     sortButtonContent?: JSX.Element
     onRowPrepare?: (row: TPreparedRow<T>, rowIndex?: number) => React.CSSProperties | undefined
   }
-  onLoadData?: (filterValue: TFilterValue) => void
+  onLoadData?: (filterValue: TFilterValue<T>) => void
   onCellClick?: (cellValue: TValue, row?: TPreparedRow<T>) => void
-  resetFilter?: boolean
+  resetFilter?: [boolean, (value: boolean) => void]
   defaultSort?: { columnName: string; mode: ESortMode }
   headerJSX?: JSX.Element
   footerJSX?: JSX.Element
@@ -37,16 +38,17 @@ export const MyTableFactory = <T extends TRow>() => {
     rows,
     filterEnabled = false,
     filterAvailableValues,
+    defaultFilter,
     width = 100,
     styles,
     onLoadData,
     onCellClick,
-    resetFilter = false,
+    resetFilter,
     defaultSort,
     headerJSX,
     footerJSX,
   }) => {
-    const [filterValue, getFilterInput, cleanFilter] = useFilter<T>()
+    const [filterValue, getFilterInput, cleanFilter] = useFilter<T>(defaultFilter)
 
     const [sortMode, setSortMode] = useState<ESortMode>(defaultSort?.mode || ESortMode.ASC)
     const [sortedColumnName, setSortedColumnName] = useState<keyof T>(defaultSort?.columnName || '')
@@ -56,12 +58,16 @@ export const MyTableFactory = <T extends TRow>() => {
     let preparedColumns: IColumn<T>[] = prepareColumns<T>(columns, preparedRows)
 
     useEffect(() => {
-      filterValue && onLoadData?.(filterValue)
+      const filter = filterValue && Object.keys(filterValue).length ? filterValue : undefined
+      onLoadData?.(filter)
     }, [filterValue]) //eslint-disable-line
 
     useEffect(() => {
-      resetFilter && cleanFilter()
-    }, [resetFilter]) //eslint-disable-line
+      if (resetFilter?.[0]) {
+        cleanFilter()
+        resetFilter?.[1](false)
+      }
+    }, [resetFilter?.[0]]) //eslint-disable-line
 
     const onSort: TOnSort<T> = (columnName) => {
       setSortMode((prevState) => (prevState === ESortMode.ASC ? ESortMode.DESC : ESortMode.ASC))

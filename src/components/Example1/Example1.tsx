@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-import { flushSync } from 'react-dom'
+import React, { useCallback, useMemo, useState } from 'react'
 import { MyTableFactory } from '../../MyTable/MyTableFactory'
 import { ESortMode, IColumn, TFilterValue, TPreparedRow } from '../../MyTable/types'
 import { rows } from './data'
@@ -82,14 +81,10 @@ export const Example1: React.FC = () => {
     benefitCode: ['Код льготы 1', 'Код льготы 2'],
   }
 
-  const onLoadData = (filterValue: TFilterValue) => console.log('load new data with filter:', filterValue)
+  const onLoadData = (filterValue: TFilterValue<IExample1TableRow>) =>
+    console.log('load new data with filter:', filterValue)
 
-  const onReset = () => {
-    flushSync(() => setFilterReset(true))
-    setFilterReset(false)
-  }
-
-  const MyTable = MyTableFactory<IExample1TableRow>()
+  const MyTable = useCallback(MyTableFactory<IExample1TableRow>(), []) //eslint-disable-line
 
   return (
     <section className={styles.example1}>
@@ -98,7 +93,7 @@ export const Example1: React.FC = () => {
         <button className={styles.btn} onClick={() => setFilterVisible((prevValue) => !prevValue)}>
           Показать фильтр
         </button>
-        <button className={styles.btn} onClick={onReset}>
+        <button className={styles.btn} onClick={() => setFilterReset(true)}>
           Сбросить фильтр
         </button>
       </div>
@@ -107,17 +102,21 @@ export const Example1: React.FC = () => {
         rows={rows}
         filterEnabled={filterVisible}
         filterAvailableValues={filterAvailableValues}
+        defaultFilter={useMemo(() => ({ benefitName: { mode: 'contains', value: 'Наменование льготы 1' } }), [])} //eslint-disable-line
         width={50}
-        styles={{
-          table: tableStyle,
-          th: thStyle,
-          td: tdStyle,
-          filterCell: filterCellStyle,
-          onRowPrepare: onRowStylePrepare,
-        }}
+        styles={useMemo(
+          () => ({
+            table: tableStyle,
+            th: thStyle,
+            td: tdStyle,
+            filterCell: filterCellStyle,
+            onRowPrepare: onRowStylePrepare,
+          }),
+          [] //eslint-disable-line
+        )}
         onLoadData={onLoadData}
-        resetFilter={filterReset}
-        defaultSort={{ columnName: 'id', mode: ESortMode.ASC }}
+        resetFilter={useMemo(() => [filterReset, setFilterReset], [filterReset])}
+        defaultSort={useMemo(() => ({ columnName: 'id', mode: ESortMode.ASC }), [])}
       />
     </section>
   )

@@ -2,8 +2,8 @@ import { TFilterValue, TRow } from '../types'
 
 interface IProps<T> {
   columnName: keyof T
-  filterValue: TFilterValue
-  setFilterValue: (filterValue: TFilterValue) => void
+  filterValue: TFilterValue<T>
+  setFilterValue: (filterValue: TFilterValue<T>) => void
   availableValues: string[]
 }
 

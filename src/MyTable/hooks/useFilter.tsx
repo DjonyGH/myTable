@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { FilterFromToInput, TFilterFromToInput } from '../components/FilterFromToInput'
 import { FilterSelectInput, TFilterSelectInput } from '../components/FilterSelectInput'
 import { FilterTextInput, TFilterTextInput } from '../components/FilterTextInput'
 import { TFilterMode, TFilterValue, TGetFilterInput, TRow } from '../types'
 
-export type TUseFilter = <T extends TRow>() => [TFilterValue, TGetFilterInput<T>, () => void]
+export type TUseFilter = <T extends TRow>(
+  defaultValue: TFilterValue<T>
+) => [TFilterValue<T>, TGetFilterInput<T>, () => void]
 
-export const useFilter: TUseFilter = <T extends TRow>() => {
-  const [filterValue, setFilterValue] = useState<TFilterValue>()
+export const useFilter: TUseFilter = <T extends TRow>(defaultValue: TFilterValue<T>) => {
+  const [filterValue, setFilterValue] = useState<TFilterValue<T>>(defaultValue)
 
   const FilterTextInputTyped = FilterTextInput as TFilterTextInput<T>
   const FilterSelectInputTyped = FilterSelectInput as TFilterSelectInput<T>
@@ -59,12 +61,8 @@ export const useFilter: TUseFilter = <T extends TRow>() => {
   }
 
   const cleanFilter = () => {
-    setFilterValue({})
+    setFilterValue({} as TFilterValue<T>)
   }
-
-  useEffect(() => {
-    if (filterValue && Object.keys(filterValue).length === 0) setFilterValue(undefined)
-  }, [filterValue])
 
   return [filterValue, getFilterInput, cleanFilter]
 }

@@ -14,7 +14,7 @@ export type TGetFilterInput<T> = (
   filterMode: TFilterMode,
   availableValues?: string[]
 ) => JSX.Element
-export type TFilterValue = { [key: string]: { mode: TFilterMode; value: TValue | TValueFromTo } } | undefined
+export type TFilterValue<T> = { [key in keyof T]?: { mode: TFilterMode; value: TValue | TValueFromTo } } | undefined
 
 export type TOnSort<T> = (columnName: keyof T) => void
 export enum ESortMode {

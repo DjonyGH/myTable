@@ -5,8 +5,8 @@ interface IProps<T> {
   columnName: keyof T
   mode: TFilterMode
   placeholder: string
-  filterValue: TFilterValue
-  setFilterValue: (filterValue: TFilterValue) => void
+  filterValue: TFilterValue<T>
+  setFilterValue: (filterValue: TFilterValue<T>) => void
 }
 
 export type TFilterTextInput<T = TRow> = React.FC<IProps<T>>
@@ -18,6 +18,7 @@ export const FilterTextInput: TFilterTextInput = ({ columnName, mode, placeholde
       className='filter_input'
       name={columnName as string}
       placeholder={placeholder}
+      defaultValue={filterValue?.[columnName]?.mode === mode ? (filterValue?.[columnName]?.value as string) : undefined}
       onInput={debounce((e: React.ChangeEvent<HTMLInputElement>) => {
         setFilterValue({
           ...filterValue,

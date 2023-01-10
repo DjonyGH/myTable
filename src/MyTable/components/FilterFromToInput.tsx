@@ -3,8 +3,8 @@ import { TFilterValue, TRow, TValueFromTo } from '../types'
 
 interface IProps<T> {
   columnName: keyof T
-  filterValue: TFilterValue
-  setFilterValue: (filterValue: TFilterValue) => void
+  filterValue: TFilterValue<T>
+  setFilterValue: (filterValue: TFilterValue<T>) => void
 }
 
 export type TFilterFromToInput<T = TRow> = React.FC<IProps<T>>

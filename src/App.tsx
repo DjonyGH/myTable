@@ -8,12 +8,11 @@ function App() {
       <h1>MyTable</h1>
 
       <p>Компонент для работы с таблицами</p>
+      <Example1 />
 
       <Api />
 
       <DataTypes />
-
-      <Example1 />
     </div>
   )
 }
