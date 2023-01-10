@@ -1,6 +1,7 @@
-import { Api } from './components/Api/Api'
-import { DataTypes } from './components/DataTypes/DataTypes'
+// import { Api } from './components/Api/Api'
+// import { DataTypes } from './components/DataTypes/DataTypes'
 import { Example1 } from './components/Example1/Example1'
+import { Example2 } from './components/Example2/Example2'
 
 function App() {
   return (
@@ -10,9 +11,11 @@ function App() {
       <p>Компонент для работы с таблицами</p>
       <Example1 />
 
-      <Api />
+      <Example2 />
 
-      <DataTypes />
+      {/* <Api />
+
+      <DataTypes /> */}
     </div>
   )
 }

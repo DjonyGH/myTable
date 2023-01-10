@@ -14,6 +14,9 @@ export const FilterSelectInput: TFilterSelectInput = ({ columnName, filterValue,
     <select
       className='filter_input'
       name={columnName as string}
+      defaultValue={
+        filterValue?.[columnName]?.mode === 'select' ? (filterValue?.[columnName]?.value as string) : undefined
+      }
       onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
         setFilterValue({
           ...filterValue,

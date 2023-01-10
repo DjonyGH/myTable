@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { MyTableFactory } from '../../MyTable/MyTableFactory'
 import { ESortMode, IColumn, TFilterValue, TPreparedRow } from '../../MyTable/types'
+import { filterCellStyle, tableStyle, tdStyle, thStyle } from '../../styles'
 import { rows } from './data'
 import styles from './example1.module.scss'
 import { IExample1TableRow } from './types'
@@ -49,32 +50,11 @@ export const Example1: React.FC = () => {
     },
   ]
 
-  const tableStyle: React.CSSProperties = {
-    borderCollapse: 'collapse',
-  }
-
-  const thStyle: React.CSSProperties = {
-    textAlign: 'left',
-    padding: '8px 16px',
-    height: '63px',
-    border: '1px solid hsl(220deg, 6%, 80%)',
-  }
-
-  const tdStyle: React.CSSProperties = {
-    textAlign: 'left',
-    padding: '8px 16px',
-    height: '32px',
-    border: '1px solid hsl(220deg, 6%, 80%)',
-  }
-
   const onRowStylePrepare = (row: TPreparedRow<IExample1TableRow>) => {
-    if (row.id.value === 1) {
-      return { backgroundColor: '#aeb1b7' }
+    const id: number = +row.id.value
+    if (id % 2 === 1) {
+      return { backgroundColor: '#e6faf9' }
     }
-  }
-
-  const filterCellStyle: React.CSSProperties = {
-    border: '1px solid hsl(220deg, 6%, 80%)',
   }
 
   const filterAvailableValues = {
@@ -102,7 +82,7 @@ export const Example1: React.FC = () => {
         rows={rows}
         filterEnabled={filterVisible}
         filterAvailableValues={filterAvailableValues}
-        defaultFilter={useMemo(() => ({ benefitName: { mode: 'contains', value: 'Наменование льготы 1' } }), [])} //eslint-disable-line
+        defaultFilter={useMemo(() => ({ benefitValue: { mode: 'fromTo', value: [0, 12] } }), [])} //eslint-disable-line
         width={50}
         styles={useMemo(
           () => ({

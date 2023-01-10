@@ -17,6 +17,11 @@ export const FilterFromToInput: TFilterFromToInput = ({ columnName, filterValue,
         className='filter_input_50'
         name={columnName as string}
         placeholder='От ...'
+        defaultValue={
+          filterValue?.[columnName]?.mode === 'fromTo'
+            ? (filterValue?.[columnName]?.value as [number, number])[0]
+            : undefined
+        }
         onInput={debounce((e: React.ChangeEvent<HTMLInputElement>) => {
           const to: number | undefined = (filterValue?.[columnName]?.value as TValueFromTo)?.[1]
           setFilterValue({
@@ -33,6 +38,11 @@ export const FilterFromToInput: TFilterFromToInput = ({ columnName, filterValue,
         className='filter_input_50'
         name={columnName as string}
         placeholder='До ...'
+        defaultValue={
+          filterValue?.[columnName]?.mode === 'fromTo'
+            ? (filterValue?.[columnName]?.value as [number, number])[1]
+            : undefined
+        }
         onInput={debounce((e: React.ChangeEvent<HTMLInputElement>) => {
           const from: number | undefined = (filterValue?.[columnName]?.value as TValueFromTo)?.[0]
           setFilterValue({

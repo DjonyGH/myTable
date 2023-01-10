@@ -1,14 +1,18 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FilterFromToInput, TFilterFromToInput } from '../components/FilterFromToInput'
 import { FilterSelectInput, TFilterSelectInput } from '../components/FilterSelectInput'
 import { FilterTextInput, TFilterTextInput } from '../components/FilterTextInput'
 import { TFilterMode, TFilterValue, TGetFilterInput, TRow } from '../types'
 
 export type TUseFilter = <T extends TRow>(
-  defaultValue: TFilterValue<T>
-) => [TFilterValue<T>, TGetFilterInput<T>, () => void]
+  defaultValue: TFilterValue<T>,
+  resetFilter?: [boolean, (value: boolean) => void]
+) => [TFilterValue<T>, TGetFilterInput<T>]
 
-export const useFilter: TUseFilter = <T extends TRow>(defaultValue: TFilterValue<T>) => {
+export const useFilter: TUseFilter = <T extends TRow>(
+  defaultValue: TFilterValue<T>,
+  resetFilter?: [boolean, (value: boolean) => void]
+) => {
   const [filterValue, setFilterValue] = useState<TFilterValue<T>>(defaultValue)
 
   const FilterTextInputTyped = FilterTextInput as TFilterTextInput<T>
@@ -17,7 +21,7 @@ export const useFilter: TUseFilter = <T extends TRow>(defaultValue: TFilterValue
 
   const getFilterInput: TGetFilterInput<T> = (columnName, filterMode, availableValues) => {
     const filters: Record<TFilterMode, JSX.Element> = {
-      startWith: (
+      startWith: !resetFilter?.[0] ? (
         <FilterTextInputTyped
           columnName={columnName}
           mode={filterMode}
@@ -25,8 +29,10 @@ export const useFilter: TUseFilter = <T extends TRow>(defaultValue: TFilterValue
           filterValue={filterValue}
           setFilterValue={setFilterValue}
         />
+      ) : (
+        <></>
       ),
-      contains: (
+      contains: !resetFilter?.[0] ? (
         <FilterTextInputTyped
           columnName={columnName}
           mode={filterMode}
@@ -34,19 +40,25 @@ export const useFilter: TUseFilter = <T extends TRow>(defaultValue: TFilterValue
           filterValue={filterValue}
           setFilterValue={setFilterValue}
         />
+      ) : (
+        <></>
       ),
-      select: (
+      select: !resetFilter?.[0] ? (
         <FilterSelectInputTyped
           columnName={columnName}
           filterValue={filterValue}
           setFilterValue={setFilterValue}
           availableValues={availableValues || []}
         />
+      ) : (
+        <></>
       ),
-      fromTo: (
+      fromTo: !resetFilter?.[0] ? (
         <FilterFromToInputTyped columnName={columnName} filterValue={filterValue} setFilterValue={setFilterValue} />
+      ) : (
+        <></>
       ),
-      equal: (
+      equal: !resetFilter?.[0] ? (
         <FilterTextInputTyped
           columnName={columnName}
           mode={filterMode}
@@ -54,6 +66,8 @@ export const useFilter: TUseFilter = <T extends TRow>(defaultValue: TFilterValue
           filterValue={filterValue}
           setFilterValue={setFilterValue}
         />
+      ) : (
+        <></>
       ),
     }
 
@@ -61,8 +75,16 @@ export const useFilter: TUseFilter = <T extends TRow>(defaultValue: TFilterValue
   }
 
   const cleanFilter = () => {
+    console.log('cleanFilter')
     setFilterValue({} as TFilterValue<T>)
   }
 
-  return [filterValue, getFilterInput, cleanFilter]
+  useEffect(() => {
+    if (resetFilter?.[0]) {
+      cleanFilter()
+      resetFilter?.[1](false)
+    }
+  }, [resetFilter?.[0]]) //eslint-disable-line
+
+  return [filterValue, getFilterInput]
 }

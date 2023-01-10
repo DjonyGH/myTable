@@ -1,4 +1,4 @@
-import { IColumn, TRow, TPreparedRow } from '../types'
+import { IColumn, TRow, TPreparedRow, IMultiLevelColumn, TPreparedColumns } from '../types'
 
 export const isArray = (arg: any) => {
   return Object.prototype.toString.call(arg) === '[object Array]'
@@ -99,18 +99,72 @@ export const prepareRows: TPrepareRows = <T extends TRow>(rows: TRow[]) => {
   }, [] as TPreparedRow<T>[])
 }
 
-type TPrepareColumns = <T extends TRow>(columns: IColumn<T>[] | undefined, rows: TPreparedRow<T>[]) => IColumn<T>[]
+type TPrepareColumns = <T extends TRow>(
+  columns: IColumn<T>[] | undefined,
+  rows: TPreparedRow<T>[]
+) => TPreparedColumns<T>
 
 export const prepareColumns: TPrepareColumns = <T extends TRow>(
   columns: IColumn<T>[] | undefined,
   rows: TPreparedRow<T>[]
 ) => {
-  let preparedColumns: IColumn<T>[] = []
+  let preparedColumnsForHead: IMultiLevelColumn<T>[][] | undefined
+  let preparedColumnsForBody: IColumn<T>[] = []
 
   if ((!columns || !columns.length) && rows[0]) {
-    preparedColumns = Object.keys(rows[0]).map((item) => ({ name: item, title: item }))
+    preparedColumnsForBody = Object.keys(rows[0]).map((item) => ({ name: item, title: item }))
   } else {
-    columns && (preparedColumns = columns)
+    columns && (preparedColumnsForBody = columns)
   }
-  return preparedColumns
+
+  const isMultiLevelHeader = (preparedColumnsForBody as IColumn<T>[]).some((col) => col.items && col.items.length)
+
+  if (isMultiLevelHeader) {
+    const row1: IMultiLevelColumn<T>[] = preparedColumnsForBody.reduce((acc, col) => {
+      const isGroupedCol = col.items && col.items.length
+      if (!isGroupedCol) {
+        acc.push({
+          ...col,
+          rowSpan: 2,
+          colSpan: 1,
+        })
+      } else {
+        acc.push({
+          ...col,
+          rowSpan: 1,
+          colSpan: col!.items!.length,
+        })
+      }
+      return acc
+    }, [] as IMultiLevelColumn<T>[])
+
+    const row2: IMultiLevelColumn<T>[] = preparedColumnsForBody.reduce((acc, col) => {
+      const isGroupedCol = col.items && col.items.length
+      if (isGroupedCol) {
+        col.items?.forEach((item) => {
+          acc.push({
+            ...item,
+            rowSpan: 1,
+            colSpan: 1,
+          })
+        })
+      }
+      return acc
+    }, [] as IMultiLevelColumn<T>[])
+    preparedColumnsForHead = [row1, row2]
+    preparedColumnsForBody = preparedColumnsForBody.reduce((acc, col) => {
+      const isGroupedCol = col.items && col.items.length
+      if (!isGroupedCol) {
+        acc.push(col)
+      } else {
+        col.items?.forEach((subCol) => acc.push(subCol))
+      }
+      return acc
+    }, [] as IColumn<T>[])
+  }
+
+  return {
+    forTBody: preparedColumnsForBody,
+    forTHead: preparedColumnsForHead,
+  }
 }

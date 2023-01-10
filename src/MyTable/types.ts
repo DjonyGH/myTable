@@ -29,4 +29,15 @@ export interface IColumn<T extends TRow> {
   cellRender?: (cellValue: TValue, row?: TPreparedRow<T>) => JSX.Element
   filterMode?: TFilterMode
   sortEnabled?: boolean
+  items?: IColumn<T>[]
+}
+
+export interface IMultiLevelColumn<T extends TRow> extends IColumn<T> {
+  rowSpan: number
+  colSpan: number
+}
+
+export type TPreparedColumns<T extends TRow> = {
+  forTHead?: IMultiLevelColumn<T>[][]
+  forTBody: IColumn<T>[]
 }

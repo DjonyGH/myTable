@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { IColumn, TRow, TPreparedRow, TFilterValue, TOnSort, ESortMode, TValue } from './types'
+import { IColumn, TRow, TPreparedRow, TFilterValue, TOnSort, ESortMode, TValue, TPreparedColumns } from './types'
 import { prepareColumns, prepareRows } from './utils'
 import s from './MyTable.module.css'
 import './myTable.css'
@@ -48,26 +48,19 @@ export const MyTableFactory = <T extends TRow>() => {
     headerJSX,
     footerJSX,
   }) => {
-    const [filterValue, getFilterInput, cleanFilter] = useFilter<T>(defaultFilter)
+    const [filterValue, getFilterInput] = useFilter<T>(defaultFilter, resetFilter)
 
     const [sortMode, setSortMode] = useState<ESortMode>(defaultSort?.mode || ESortMode.ASC)
     const [sortedColumnName, setSortedColumnName] = useState<keyof T>(defaultSort?.columnName || '')
 
-    const preparedRows = prepareRows<T>(rows)
+    const preparedRows: TPreparedRow<T>[] = prepareRows<T>(rows)
 
-    let preparedColumns: IColumn<T>[] = prepareColumns<T>(columns, preparedRows)
+    const preparedColumns: TPreparedColumns<T> = prepareColumns<T>(columns, preparedRows)
 
     useEffect(() => {
       const filter = filterValue && Object.keys(filterValue).length ? filterValue : undefined
       onLoadData?.(filter)
     }, [filterValue]) //eslint-disable-line
-
-    useEffect(() => {
-      if (resetFilter?.[0]) {
-        cleanFilter()
-        resetFilter?.[1](false)
-      }
-    }, [resetFilter?.[0]]) //eslint-disable-line
 
     const onSort: TOnSort<T> = (columnName) => {
       setSortMode((prevState) => (prevState === ESortMode.ASC ? ESortMode.DESC : ESortMode.ASC))
@@ -89,9 +82,66 @@ export const MyTableFactory = <T extends TRow>() => {
         <div style={{ ...styles?.header, width: `${width}%` }}>{headerJSX}</div>
         <table style={{ ...styles?.table, width: `${width}%` }}>
           <thead>
-            <tr>
-              {preparedColumns &&
-                preparedColumns.map((col, idx) => (
+            {preparedColumns && preparedColumns.forTHead ? (
+              <>
+                <tr>
+                  {preparedColumns.forTHead[0].map((col, idx) => (
+                    <th
+                      style={{ ...styles?.th, width: `${col.width}px`, position: 'relative' }}
+                      key={idx}
+                      colSpan={col.colSpan}
+                      rowSpan={col.rowSpan}
+                    >
+                      {col.title}
+                      {col.sortEnabled && col.colSpan === 1 && (
+                        <button
+                          className={`${s.sortButton} ${sortMode === ESortMode.DESC ? s.sortButtonDesc : ''} ${
+                            sortedColumnName === col.name ? s.sortActive : ''
+                          }`}
+                          style={
+                            sortedColumnName === col.name
+                              ? { ...styles?.sortButton, ...styles?.sortButtonActive }
+                              : styles?.sortButton
+                          }
+                          onClick={() => onSort(col.name)}
+                        >
+                          {styles?.sortButtonContent || '>'}
+                        </button>
+                      )}
+                    </th>
+                  ))}
+                </tr>
+                <tr>
+                  {preparedColumns.forTHead[1].map((col, idx) => (
+                    <th
+                      style={{ ...styles?.th, width: `${col.width}px`, position: 'relative' }}
+                      key={idx}
+                      colSpan={col.colSpan}
+                      rowSpan={col.rowSpan}
+                    >
+                      {col.title}
+                      {col.sortEnabled && col.colSpan === 1 && (
+                        <button
+                          className={`${s.sortButton} ${sortMode === ESortMode.DESC ? s.sortButtonDesc : ''} ${
+                            sortedColumnName === col.name ? s.sortActive : ''
+                          }`}
+                          style={
+                            sortedColumnName === col.name
+                              ? { ...styles?.sortButton, ...styles?.sortButtonActive }
+                              : styles?.sortButton
+                          }
+                          onClick={() => onSort(col.name)}
+                        >
+                          {styles?.sortButtonContent || '>'}
+                        </button>
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              </>
+            ) : (
+              <tr>
+                {preparedColumns.forTBody.map((col, idx) => (
                   <th style={{ ...styles?.th, width: `${col.width}px`, position: 'relative' }} key={idx}>
                     {col.title}
                     {col.sortEnabled && (
@@ -111,7 +161,8 @@ export const MyTableFactory = <T extends TRow>() => {
                     )}
                   </th>
                 ))}
-            </tr>
+              </tr>
+            )}
           </thead>
 
           <tbody>
@@ -119,7 +170,7 @@ export const MyTableFactory = <T extends TRow>() => {
             {filterEnabled && (
               <tr className={s.filterRow}>
                 {columns &&
-                  columns.map((col, idx) => (
+                  preparedColumns.forTBody.map((col, idx) => (
                     <td style={styles?.filterCell} key={idx}>
                       {col.filterMode && getFilterInput(col.name, col.filterMode, filterAvailableValues?.[col.name])}
                     </td>
@@ -131,7 +182,7 @@ export const MyTableFactory = <T extends TRow>() => {
             {preparedRows.map((row: TPreparedRow<T>, idx: number) => (
               <tr key={idx} style={{ ...styles?.onRowPrepare?.(row) }}>
                 {columns
-                  ? columns.map((col, idx) => {
+                  ? preparedColumns.forTBody.map((col, idx) => {
                       if (col.name in row) {
                         return (
                           <td
